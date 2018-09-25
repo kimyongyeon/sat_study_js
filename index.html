@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="lib/app.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <h1>스터디 폼  </h1>
+    <form action="">
+        <input id="txt_name" type="text" placeholder="이름 ">
+        <input id="txt_age" type="text" placeholder="나이 ">
+        <input id="txt_addr" type="text" placeholder="주소 ">
+        <button id="btn_save" onclick="save(event);">저장</button>
+        <button id="btn_add" onclick="add(event);">추가</button>
+        <button id="btn_remove" onclick="remove(event);">삭제</button>
+    </form>
+    <h2>회원 목록 </h2>
+    <table id="tbl_member_list">
+        <thead>
+        <tr>
+            <td>번호</td>
+            <td>이름</td>
+            <td>나이</td>
+            <td>주소</td>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td><td>홍길동</td><td>30</td><td>서울</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+<script>
+    //var member = Member();
+    var members = [
+        {
+            number: 1,
+            name: "영희",
+            age: 15,
+            addr: "광주"
+        },
+        {
+            number: 2,
+            name: "철수",
+            age: 16,
+            addr: "경기도"
+        },
+        {
+            number: 3,
+            name: "수미",
+            age: 17,
+            addr: "강원도"
+        },
+    ];
+
+    function memberSeq() {
+        return members.length + 1;
+    }
+
+    function dataInput(tempMember) {
+        // 객체 데이터(member) 입력
+        tempMember.number = memberSeq();
+        tempMember.name = $("#txt_name").val();
+        tempMember.age = $("#txt_age").val();
+        tempMember.addr = $("#txt_addr").val();
+    }
+
+    function dataAdd(tempMember) {
+        var memberAddFlag = false;
+        for (var i=0; i<this.members.length; i++) {
+            var m = this.members[i];
+            if (m.name == tempMember.name && m.age == tempMember.age) {
+                memberAddFlag = true;
+                break;
+            } else {
+                memberAddFlag = false;
+            }
+        }
+        console.log("memberAddFlag="+memberAddFlag);
+        if (memberAddFlag) {
+            return false;
+        } else {
+            this.members.push(tempMember);
+            return true;
+        }
+        
+    }
+
+    function dataList() {
+        var dbMembers = localStorage.getItem("members");
+        this.members = JSON.parse(dbMembers);
+        console.log(">>>>>>>>>>>>>>>>>>> " + this.members);
+        var len = members.length;
+        for (var i=0; i<len; i++) {
+            tempMember = members[i];
+            console.log(`${i}번째 번호는 => ${tempMember.number}`);
+            console.log(`${i}번째 이름는 => ${tempMember.name}`);
+            console.log(`${i}번째 나이는 => ${tempMember.age}`);
+            console.log(`${i}번째 주소는 => ${tempMember.addr}`);
+            console.log(`member is => ${JSON.stringify(tempMember)}`);
+            // 화면 출력 
+            tableDisplay(tempMember); 
+        }
+    }
+
+    function tableDisplay(member) {
+        var tBody = `
+            <tr>
+                <td>${member.number}</td>
+                <td>${member.name}</td>
+                <td>${member.age}</td>
+                <td>${member.addr}</td>
+            </tr>
+        `;
+        $("#tbl_member_list tbody").append(tBody);
+    }
+
+    // 추가 
+    function add(e) {
+        e.preventDefault();
+        var member = {};
+        dataInput(member); // 화면에 받는 함수
+        var displayResult = dataAdd(member); // DB 입력 함수
+        console.log(`DB 값은 => ${JSON.stringify(members)}`);
+        if (displayResult) {
+            tableDisplay(member); // 화면출력
+        } else {
+            alert("중복 데이터 입니다.");
+        }
+         
+        // dataList(); // 출력함수 
+    }
+
+    // 저장
+    function save(e) {
+        e.preventDefault();
+        // this.members => client db 
+        localStorage.setItem("members", JSON.stringify(this.members));
+        $("#tbl_member_list tbody").empty();
+        dataList();
+    }
+
+    function remove() {
+        
+    }
+
+    function edit () {
+
+    }
+
+    // 데이블 목록 입/출력
+    function list () {
+        var tempMember = {};
+        // 화면 데이터 받는다. 
+        dataInput(tempMember);
+        // 데이터를 모델에 담는다 
+        if (tempMember.name != "") {
+            dataAdd(tempMember);
+        }
+        // 모델을 출력한다. 
+        dataList();
+    }
+
+    function init() {
+        list();
+    }
+    init();
+
+</script>
+</html>
